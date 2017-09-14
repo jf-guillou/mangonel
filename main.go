@@ -5,35 +5,15 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"log"
-	"mime"
-	"mime/multipart"
 	"net/http"
 	"os"
-	"path"
-	"regexp"
 	"strconv"
 
-	"github.com/dchest/uniuri"
 	"github.com/gorilla/mux"
+	"github.com/sirupsen/logrus"
 )
 
-// Configuration read from config.json
-type Configuration struct {
-	// Hash length
-	Length int
-	// Listening address:port
-	Addr string
-	// Storage path
-	Storage string
-}
-
-var configuration Configuration
-
-const minHashLen int = 1
-const maxHashLen int = 30
-const maxFileSize int = 2048000
-
+var log = logrus.New()
 var allowedFileExtensions = []string{
 	".jpg",
 	".jpeg",
@@ -41,41 +21,12 @@ var allowedFileExtensions = []string{
 	".png",
 }
 
-var fileExtRegex = regexp.MustCompile("^[a-z0-9]{" + string(minHashLen) + "," + string(maxHashLen) + "}\\.?[a-z0-9]{0,5}$")
-
-func loadConfiguration() {
-	file, err := os.Open("mangonel-config.json")
-	if err != nil {
-		panic(err)
-	}
-
-	decoder := json.NewDecoder(file)
-	err = decoder.Decode(&configuration)
-	if err != nil {
-		panic(err)
-	}
-
-	if configuration.Length > maxHashLen {
-		configuration.Length = maxHashLen
-	}
-
-	if configuration.Length < minHashLen {
-		configuration.Length = minHashLen
-	}
-
-	f, err := os.Stat(configuration.Storage)
-	if err != nil {
-		panic(err)
-	}
-
-	if !f.IsDir() {
-		panic("configuration.storage path is not a valid directory")
-	}
-}
-
 func main() {
+	log.Out = os.Stdout
+	log.Level = logrus.InfoLevel
+
 	loadConfiguration()
-	println("Loading routes")
+	log.Info("Loading routes")
 
 	router := mux.NewRouter()
 
@@ -84,11 +35,13 @@ func main() {
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("assets/static"))))
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir(configuration.Storage)))
 
-	println("Run")
+	log.Info("Listen and serve")
 	err := http.ListenAndServe(configuration.Addr, router)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Info("Bye")
 }
 
 type response struct {
@@ -109,6 +62,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Debug("Reading multipart data")
 	for {
 		part, err := reader.NextPart()
 		if err == io.EOF {
@@ -124,14 +78,18 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 				jsonErr(w, err)
 				return
 			}
-			filesize, err := strconv.Atoi(string(b))
-			if err != nil {
-				jsonErr(w, errors.New("Unable to read file size"))
-				return
-			}
-			if filesize > maxFileSize {
-				jsonErr(w, errors.New("File is too big (>"+string(maxFileSize)+")"))
-				return
+
+			if configuration.MaxFilesize > 0 {
+				filesize, err := strconv.Atoi(string(b))
+				if err != nil {
+					jsonErr(w, errors.New("Malformed filesize"))
+					return
+				}
+
+				if filesize > configuration.MaxFilesize {
+					jsonErr(w, errors.New("File is too big (>"+string(configuration.MaxFilesize)+")"))
+					return
+				}
 			}
 			validFilesize = true
 		case "qqfile":
@@ -139,25 +97,15 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 				jsonErr(w, errors.New("Unable to determine file size"))
 				return
 			}
-			ext := fileExtension(part.FileName(), part.Header.Get("content-type"))
-			if ext == "" {
-				jsonErr(w, errors.New("Unable to determine file extension"))
-				return
-			}
-			if !stringInSlice(ext, allowedFileExtensions) {
-				jsonErr(w, errors.New("Disallowed file extension : "+ext))
-				return
-			}
 
-			filename := genFilename(ext)
-			err := storeFile(path.Join(configuration.Storage, filename), part)
-			files = append(files, filename)
-			validFilesize = false
+			filename, err := handleFilePart(part)
 			if err != nil {
 				jsonErr(w, err)
 				return
 			}
-			println(part.FileName() + " stored as " + filename)
+
+			files = append(files, filename)
+			validFilesize = false
 		}
 	}
 
@@ -167,67 +115,20 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		println(err)
+		log.Error("Encode errored", err)
 	}
 }
 
 func jsonErr(w http.ResponseWriter, e error) {
+	log.Warn("Request errored ", e)
 	err := json.NewEncoder(w).Encode(response{
 		Success: false,
 		Error:   e.Error(),
 	})
 
 	if err != nil {
-		println(err)
+		log.Error("Encode errored ", err)
 	}
-}
-
-func stringInSlice(a string, list []string) bool {
-	for _, b := range list {
-		if b == a {
-			return true
-		}
-	}
-	return false
-}
-
-func genFilename(ext string) string {
-	for {
-		filename := uniuri.NewLen(configuration.Length) + ext
-
-		_, err := os.Stat(path.Join(configuration.Storage, filename))
-		if err != nil {
-			return filename
-		}
-	}
-}
-
-func fileExtension(filename, mimetype string) string {
-	ext := path.Ext(filename)
-	if ext != "" {
-		return ext
-	}
-
-	exts, err := mime.ExtensionsByType(mimetype)
-	if err != nil || len(exts) == 0 {
-		return ""
-	}
-
-	return exts[0]
-}
-
-func storeFile(to string, part *multipart.Part) error {
-	dst, err := os.Create(to)
-	if err != nil {
-		return err
-	}
-	defer dst.Close()
-
-	if _, err := io.Copy(dst, part); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {

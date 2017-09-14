@@ -1,5 +1,6 @@
 {
     "addr": "127.0.0.1:8066",
     "length": 5,
-    "storage": "/var/www/mangonel/storage/"
+    "storage": "D:\\mangonel",
+    "maxFilesize": 2048000
 }
