@@ -25,8 +25,11 @@ func main() {
 
 	router := mux.NewRouter()
 
-	router.HandleFunc("/", rootHandler)
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "assets/index.html")
+	})
 	router.HandleFunc("/up", uploadHandler).Methods("POST")
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("assets/static"))))
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir(configuration.StoragePath)))
 
 	log.Info("Listen and serve")
@@ -87,8 +90,4 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_, _ = w.Write([]byte(filename))
-}
-
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "assets/index.html")
 }

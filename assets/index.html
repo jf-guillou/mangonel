@@ -4,10 +4,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Mangonel upload</title>
     <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+    <link rel="apple-touch-icon" sizes="180x180" href="./static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./static/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./static/favicon-16x16.png">
+    <link rel="manifest" href="./static/site.webmanifest">
+
     <style>
         body {
+            background-color: #121212;
+            color: #CCC;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
             text-align: center;
+        }
+        h1 {
+            color: #BB86FC;
+        }
+        a {
+            color: inherit;
+        }
+        .using {
+            margin-bottom: 12px;
+        }
+        .using img {
+            margin-bottom: -2px;
         }
         #form-container {
             margin: 0 auto;
@@ -23,7 +42,9 @@
 
 <body>
     <h1>Mangonel image uploader</h1>
-    <h4>Using <a href="https://github.com/jf-guillou/mangonel" target="_blank">Mangonel</a> &amp; <a href="https://pqina.nl/filepond/" target="_blank">FilePond</a>. <a href="#" onclick="purge()"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAWElEQVQ4je2NMQ7AIAhFnz2CZzadeuDiQhcGqyGWwcShb/k/AR6wiBMQQC1LVCBAtp6B21tMTdfAgzSUgOR1c0yW+hzwBJ/5BQsE1VKdlJngaiQ91eab8QCVPRAkVFol7gAAAABJRU5ErkJggg=="></a></h4>
+    <div class="using">
+        Using <a href="https://github.com/jf-guillou/mangonel" target="_blank">Mangonel</a> &amp; <a href="https://pqina.nl/filepond/" target="_blank">FilePond</a>. <a href="#" onclick="purge()" title="Purge history"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAgklEQVQ4je2SOQ6DUAxEHxRRrsAF/z8AKVPTwAnmpiBZTkESATKbkiJFXmPJy2gsDXxIETVzzo2718AFGIBW0j3aLaOmu9dmVkkqzKwCbrsOUkp+1Lak993shSMi02NYeeG1tKwRocAZ/gJfEFjmoGeM7xq9pOuWg44x+xHDc/5jPABuaipjPxAqugAAAABJRU5ErkJggg==" alt="purge"></a>
+    </div>
 
     <div id="posters-container">
     </div>
