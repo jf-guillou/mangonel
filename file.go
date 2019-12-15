@@ -11,6 +11,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/dchest/uniuri"
 )
@@ -34,7 +35,7 @@ func fileExists(path string) bool {
 func fileExtension(filename, mimetype string) string {
 	ext := path.Ext(filename)
 	if ext != "" {
-		return ext
+		return strings.ToLower(ext)
 	}
 
 	exts, err := mime.ExtensionsByType(mimetype)
