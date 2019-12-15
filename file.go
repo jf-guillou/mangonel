@@ -9,8 +9,10 @@ import (
 	"io/ioutil"
 	"mime"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/dchest/uniuri"
@@ -44,6 +46,24 @@ func fileExtension(filename, mimeType string) string {
 	}
 
 	return extArray[0]
+}
+
+func checkFileSize(r http.Header) error {
+	size := r.Get("content-length")
+
+	if size != "" {
+		log.Debugf("Announced file size of %s", size)
+		fileSize, err := strconv.Atoi(size)
+		if err != nil {
+			return err
+		}
+
+		if fileSize  > configuration.MaxFileSize {
+			return errors.New("file too big")
+		}
+	}
+
+	return nil
 }
 
 func handleFilePart(part *multipart.Part) (string, error) {

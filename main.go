@@ -1,16 +1,11 @@
 package main
 
 import (
-	"encoding/json"
-	"errors"
-	"io"
-	"io/ioutil"
-	"net/http"
-	"os"
-	"strconv"
-
 	"github.com/gorilla/mux"
 	"github.com/sirupsen/logrus"
+	"io"
+	"net/http"
+	"os"
 )
 
 var log = logrus.New()
@@ -32,7 +27,6 @@ func main() {
 
 	router.HandleFunc("/", rootHandler)
 	router.HandleFunc("/up", uploadHandler).Methods("POST")
-	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("assets/static"))))
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir(configuration.StoragePath)))
 
 	log.Info("Listen and serve")
@@ -44,91 +38,55 @@ func main() {
 	log.Info("Bye")
 }
 
-type response struct {
-	Success      bool     `json:"success"`
-	Error        string   `json:"error"`
-	PreventRetry bool     `json:"preventRetry"`
-	Reset        bool     `json:"reset"`
-	Filenames    []string `json:"filenames"`
-}
-
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
-	files := make([]string, 0)
-	validFileSize := false
+	var filename string
+	var err error
 
 	reader, err := r.MultipartReader()
 	if err != nil {
-		jsonErr(w, err)
+		log.Error("Unable to load multipart reader : ", err)
+		w.WriteHeader(http.StatusServiceUnavailable)
+		_, _ = w.Write([]byte(err.Error()))
 		return
 	}
 
 	log.Debug("Reading multipart data")
 	for {
 		part, err := reader.NextPart()
-		if err == io.EOF {
+		if err == io.EOF || part == nil {
 			break
 		}
 
 		switch part.FormName() {
-		// case "qquid":
-		// case "qqfilename":
-		case "qqtotalfilesize":
-			b, err := ioutil.ReadAll(part)
+		case "filepond":
+			if part.FileName() == "" {
+				continue
+			}
+
+			err = checkFileSize(r.Header)
 			if err != nil {
-				jsonErr(w, err)
+				log.Error("File size checks failed : ", err)
+				w.WriteHeader(http.StatusBadRequest)
+				_, _ = w.Write([]byte(err.Error()))
 				return
 			}
 
-			if configuration.MaxFileSize > 0 {
-				filesize, err := strconv.Atoi(string(b))
-				if err != nil {
-					jsonErr(w, errors.New("malformed filesize"))
-					return
-				}
-
-				if filesize > configuration.MaxFileSize {
-					jsonErr(w, errors.New("file is too big (>"+string(configuration.MaxFileSize)+")"))
-					return
-				}
-			}
-			validFileSize = true
-		case "qqfile":
-			if !validFileSize {
-				jsonErr(w, errors.New("unable to determine file size"))
-				return
-			}
-
-			filename, err := handleFilePart(part)
+			filename, err = handleFilePart(part)
 			if err != nil {
-				jsonErr(w, err)
+				log.Error("File read failed : ", err)
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = w.Write([]byte(err.Error()))
 				return
 			}
-
-			files = append(files, filename)
-			validFileSize = false
 		}
 	}
 
-	err = json.NewEncoder(w).Encode(response{
-		Success:   true,
-		Filenames: files,
-	})
-
-	if err != nil {
-		log.Error("Encode errored", err)
+	if filename == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
-}
 
-func jsonErr(w http.ResponseWriter, e error) {
-	log.Warn("Request errored ", e)
-	err := json.NewEncoder(w).Encode(response{
-		Success: false,
-		Error:   e.Error(),
-	})
-
-	if err != nil {
-		log.Error("Encode errored ", err)
-	}
+	_, _ = w.Write([]byte(filename))
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
