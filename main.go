@@ -33,10 +33,10 @@ func main() {
 	router.HandleFunc("/", rootHandler)
 	router.HandleFunc("/up", uploadHandler).Methods("POST")
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir("assets/static"))))
-	router.PathPrefix("/").Handler(http.FileServer(http.Dir(configuration.Storage)))
+	router.PathPrefix("/").Handler(http.FileServer(http.Dir(configuration.StoragePath)))
 
 	log.Info("Listen and serve")
-	err := http.ListenAndServe(configuration.Addr, router)
+	err := http.ListenAndServe(configuration.ListenAddr, router)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,15 +79,15 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			if configuration.MaxFilesize > 0 {
+			if configuration.MaxFileSize > 0 {
 				filesize, err := strconv.Atoi(string(b))
 				if err != nil {
 					jsonErr(w, errors.New("malformed filesize"))
 					return
 				}
 
-				if filesize > configuration.MaxFilesize {
-					jsonErr(w, errors.New("file is too big (>"+string(configuration.MaxFilesize)+")"))
+				if filesize > configuration.MaxFileSize {
+					jsonErr(w, errors.New("file is too big (>"+string(configuration.MaxFileSize)+")"))
 					return
 				}
 			}

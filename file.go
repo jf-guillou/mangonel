@@ -18,10 +18,10 @@ import (
 
 func genFilename(ext string) string {
 	for {
-		filename := uniuri.NewLen(configuration.Length) + ext
+		filename := uniuri.NewLen(configuration.HashLength) + ext
 		log.Debugf("Generated filename : %s", filename)
 
-		if !fileExists(path.Join(configuration.Storage, filename)) {
+		if !fileExists(path.Join(configuration.StoragePath, filename)) {
 			return filename
 		}
 	}
@@ -67,7 +67,7 @@ func handleFilePart(part *multipart.Part) (string, error) {
 	hash := fmt.Sprintf("%x", h.Sum(nil))
 
 	log.Debugf("File hashed to %s", hash)
-	hashPath := path.Join(configuration.Storage, hash)
+	hashPath := path.Join(configuration.StoragePath, hash)
 	if !fileExists(hashPath) {
 		_, err = r.Seek(0, io.SeekStart)
 		if err != nil {
@@ -80,7 +80,7 @@ func handleFilePart(part *multipart.Part) (string, error) {
 	}
 
 	filename := genFilename(ext)
-	err = os.Link(hashPath, path.Join(configuration.Storage, filename))
+	err = os.Link(hashPath, path.Join(configuration.StoragePath, filename))
 	if err != nil {
 		return "", err
 	}
