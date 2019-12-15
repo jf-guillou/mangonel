@@ -58,6 +58,10 @@ func handleFilePart(part *multipart.Part) (string, error) {
 		return "", err
 	}
 
+	if len(b) > configuration.MaxFileSize {
+		return "", errors.New("file too big")
+	}
+
 	r := bytes.NewReader(b)
 	h := sha256.New()
 	_, err = io.Copy(h, r)
