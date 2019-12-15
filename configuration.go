@@ -13,7 +13,7 @@ type Configuration struct {
 	Addr string
 	// Storage path
 	Storage string
-	// Maximum uploaded filesize (0 = unlimited)
+	// Maximum uploaded file size (0 = unlimited)
 	MaxFilesize int
 }
 

@@ -54,7 +54,7 @@ type response struct {
 
 func uploadHandler(w http.ResponseWriter, r *http.Request) {
 	files := make([]string, 0)
-	validFilesize := false
+	validFileSize := false
 
 	reader, err := r.MultipartReader()
 	if err != nil {
@@ -82,19 +82,19 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 			if configuration.MaxFilesize > 0 {
 				filesize, err := strconv.Atoi(string(b))
 				if err != nil {
-					jsonErr(w, errors.New("Malformed filesize"))
+					jsonErr(w, errors.New("malformed filesize"))
 					return
 				}
 
 				if filesize > configuration.MaxFilesize {
-					jsonErr(w, errors.New("File is too big (>"+string(configuration.MaxFilesize)+")"))
+					jsonErr(w, errors.New("file is too big (>"+string(configuration.MaxFilesize)+")"))
 					return
 				}
 			}
-			validFilesize = true
+			validFileSize = true
 		case "qqfile":
-			if !validFilesize {
-				jsonErr(w, errors.New("Unable to determine file size"))
+			if !validFileSize {
+				jsonErr(w, errors.New("unable to determine file size"))
 				return
 			}
 
@@ -105,7 +105,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			files = append(files, filename)
-			validFilesize = false
+			validFileSize = false
 		}
 	}
 

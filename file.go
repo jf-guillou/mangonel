@@ -32,25 +32,25 @@ func fileExists(path string) bool {
 	return err == nil
 }
 
-func fileExtension(filename, mimetype string) string {
+func fileExtension(filename, mimeType string) string {
 	ext := path.Ext(filename)
 	if ext != "" {
 		return strings.ToLower(ext)
 	}
 
-	exts, err := mime.ExtensionsByType(mimetype)
-	if err != nil || len(exts) == 0 {
+	extArray, err := mime.ExtensionsByType(mimeType)
+	if err != nil || len(extArray) == 0 {
 		return ""
 	}
 
-	return exts[0]
+	return extArray[0]
 }
 
 func handleFilePart(part *multipart.Part) (string, error) {
 	log.Debugf("Extract extension from %s", part.FileName())
 	ext := fileExtension(part.FileName(), part.Header.Get("content-type"))
 	if ext == "" || !stringInSlice(ext, allowedFileExtensions) {
-		return "", errors.New("Unknown file type")
+		return "", errors.New("unknown file type")
 	}
 
 	b, err := ioutil.ReadAll(part)
