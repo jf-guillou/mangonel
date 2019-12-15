@@ -60,14 +60,20 @@ func handleFilePart(part *multipart.Part) (string, error) {
 
 	r := bytes.NewReader(b)
 	h := sha256.New()
-	io.Copy(h, r)
+	_, err = io.Copy(h, r)
+	if err != nil {
+		return "", err
+	}
 	hash := fmt.Sprintf("%x", h.Sum(nil))
 
 	log.Debugf("File hashed to %s", hash)
 	hashPath := path.Join(configuration.Storage, hash)
 	if !fileExists(hashPath) {
-		r.Seek(0, io.SeekStart)
-		err := storeFile(hashPath, r)
+		_, err = r.Seek(0, io.SeekStart)
+		if err != nil {
+			return "", err
+		}
+		err = storeFile(hashPath, r)
 		if err != nil {
 			return "", err
 		}
