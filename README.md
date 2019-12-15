@@ -10,7 +10,7 @@ Overly simplified image upload HTTP microservice
 
 For some reason [Lutim](https://github.com/ldidry/lutim) in non Perl equivalents are insanely hard to find.
 
-This project does not aim to be as feature complete as [Pictshare](https://github.com/chrisiaut/pictshare), but to offer a simple web UI and some kind of backend storage.
+This project does not aim to be as feature complete as [Pictshare](https://github.com/HaschekSolutions/pictshare), but to offer a simple web UI and some kind of backend storage.
 
 ## Getting started
 ### Prerequisites
@@ -18,11 +18,20 @@ This project does not aim to be as feature complete as [Pictshare](https://githu
 
 ### Installing
 
+    git clone https://github.com/jf-guillou/mangonel.git
+    cd mangonel
+    go get
+    go build
+
 ### Updating
 
 ### Configuration
 
+    vi mangonel-config.json
+
 ### Run
+
+    ./mangonel
 
 ## FAQ
 
