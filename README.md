@@ -15,6 +15,7 @@ This project does not aim to be as feature complete as [Pictshare](https://githu
 ## Getting started
 ### Prerequisites
 * [go](https://golang.org/doc/install)
+* Some storage
 
 ### Installing
 
@@ -25,9 +26,19 @@ This project does not aim to be as feature complete as [Pictshare](https://githu
 
 ### Updating
 
+    cd mangonel
+    git pull
+    go get
+    go build
+
 ### Configuration
 
-    vi mangonel-config.json
+Using environment variables (these values are default) :
+
+    Mangonel_HashLength=5
+    Mangonel_ListenAddr="127.0.0.1:8066"
+    Mangonel_MaxFileSize=10240000
+    Mangonel_StoragePath="./storage"
 
 ### Run
 
