@@ -109,7 +109,7 @@ func handleFilePart(part *multipart.Part) (string, error) {
 		return "", err
 	}
 
-	log.Debugf("Stored as %s", filename)
+	log.Infof("Stored as %s", filename)
 	return filename, nil
 }
 
