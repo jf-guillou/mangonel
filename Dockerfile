@@ -7,6 +7,7 @@ COPY go.sum ./
 RUN go mod download
 
 COPY *.go ./
+COPY assets/ ./assets/
 
 RUN go build -o /mangonel
 
