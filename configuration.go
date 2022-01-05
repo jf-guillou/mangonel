@@ -24,7 +24,7 @@ const maxHashLen int = 30
 
 func loadConfiguration() {
 	viper.SetDefault("HashLength", 5)
-	viper.SetDefault("ListenAddr", "127.0.0.1:8066")
+	viper.SetDefault("ListenAddr", "0.0.0.0:8066")
 	viper.SetDefault("MaxFileSize", 10240000)
 	viper.SetDefault("StoragePath", "./storage")
 

@@ -1,4 +1,5 @@
 # mangonel
+
 Overly simplified image upload HTTP microservice
 
 > A mangonel was a type of catapult or siege engine used in the medieval period to throw projectiles at a castle's walls.
@@ -13,9 +14,11 @@ For some reason [Lutim](https://github.com/ldidry/lutim) in non Perl equivalents
 This project does not aim to be as feature complete as [Pictshare](https://github.com/HaschekSolutions/pictshare), but to offer a simple web UI and some kind of backend storage.
 
 ## Getting started
+
 ### Prerequisites
-* [go](https://golang.org/doc/install)
-* Some storage
+
+- [go](https://golang.org/doc/install)
+- Some storage
 
 ### Installing
 
@@ -36,7 +39,7 @@ This project does not aim to be as feature complete as [Pictshare](https://githu
 Using environment variables (these values are default) :
 
     Mangonel_HashLength=5
-    Mangonel_ListenAddr="127.0.0.1:8066"
+    Mangonel_ListenAddr="0.0.0.0:8066"
     Mangonel_MaxFileSize=10240000
     Mangonel_StoragePath="./storage"
 
