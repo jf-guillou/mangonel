@@ -10,6 +10,8 @@ COPY *.go ./
 
 RUN go build -o /mangonel
 
+VOLUME /app/storage
+
 EXPOSE 8066
 
 CMD [ "/mangonel" ]
