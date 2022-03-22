@@ -1,147 +1,170 @@
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Mangonel upload</title>
-    <link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
-    <link rel="apple-touch-icon" sizes="180x180" href="./static/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="./static/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="./static/favicon-16x16.png">
-    <link rel="manifest" href="./static/site.webmanifest">
+    <link
+      href="https://unpkg.com/filepond/dist/filepond.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./static/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./static/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./static/favicon-16x16.png"
+    />
+    <link rel="manifest" href="./static/site.webmanifest" />
 
     <style>
-        body {
-            background-color: #121212;
-            color: #CCC;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-            text-align: center;
-        }
-        h1 {
-            color: #BB86FC;
-        }
-        a {
-            color: inherit;
-        }
-        .using {
-            margin-bottom: 12px;
-        }
-        .using img {
-            margin-bottom: -2px;
-        }
-        #form-container {
-            margin: 0 auto;
-            max-width: 640px;
-        }
-        #posters-container img {
-            margin: 2px;
-            max-width: 120px;
-            max-height: 120px;
-        }
+      body {
+        background-color: #121212;
+        color: #ccc;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+          "Segoe UI Symbol";
+        text-align: center;
+      }
+      h1 {
+        color: #bb86fc;
+      }
+      a {
+        color: inherit;
+      }
+      .using {
+        margin-bottom: 12px;
+      }
+      .using img {
+        margin-bottom: -2px;
+      }
+      #form-container {
+        margin: 0 auto;
+        max-width: 640px;
+      }
+      #posters-container img {
+        margin: 2px;
+        max-width: 120px;
+        max-height: 120px;
+      }
     </style>
-</head>
+  </head>
 
-<body>
+  <body>
     <h1>Mangonel image uploader</h1>
     <div class="using">
-        Using <a href="https://github.com/jf-guillou/mangonel" target="_blank">Mangonel</a> &amp; <a href="https://pqina.nl/filepond/" target="_blank">FilePond</a>. <a href="#" onclick="purge()" title="Purge history"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAgklEQVQ4je2SOQ6DUAxEHxRRrsAF/z8AKVPTwAnmpiBZTkESATKbkiJFXmPJy2gsDXxIETVzzo2718AFGIBW0j3aLaOmu9dmVkkqzKwCbrsOUkp+1Lak993shSMi02NYeeG1tKwRocAZ/gJfEFjmoGeM7xq9pOuWg44x+xHDc/5jPABuaipjPxAqugAAAABJRU5ErkJggg==" alt="purge"></a>
+      Using
+      <a href="https://github.com/jf-guillou/mangonel" target="_blank"
+        >Mangonel</a
+      >
+      &amp; <a href="https://pqina.nl/filepond/" target="_blank">FilePond</a>.
+      <a href="#" onclick="purge()" title="Purge history"
+        ><img
+          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAAgklEQVQ4je2SOQ6DUAxEHxRRrsAF/z8AKVPTwAnmpiBZTkESATKbkiJFXmPJy2gsDXxIETVzzo2718AFGIBW0j3aLaOmu9dmVkkqzKwCbrsOUkp+1Lak993shSMi02NYeeG1tKwRocAZ/gJfEFjmoGeM7xq9pOuWg44x+xHDc/5jPABuaipjPxAqugAAAABJRU5ErkJggg=="
+          alt="purge"
+      /></a>
     </div>
 
-    <div id="posters-container">
-    </div>
+    <div id="posters-container"></div>
 
     <form id="form-container" action="up">
-        <input
-            type="file"
-            class="filepond"
-        >
+      <input type="file" class="filepond" />
     </form>
 
     <script src="https://unpkg.com/filepond/dist/filepond.js"></script>
     <script>
-        const pond = FilePond.create(
-            document.querySelector('input.filepond'),
-            {
-                server : {
-                    process: './up',
-                    revert: null,
-                    restore: null,
-                    load: null,
-                    fetch: null,
-                },
-                allowBrowse: true,
-                allowMultiple: true,
-                allowReplace: false,
-                allowRevert: false,
-                dropOnPage: true,
-                maxFiles: 20,
-            }
-        );
+      const pond = FilePond.create(document.querySelector("input.filepond"), {
+        server: {
+          process: "./up",
+          revert: null,
+          restore: null,
+          load: null,
+          fetch: null,
+        },
+        allowBrowse: true,
+        allowMultiple: true,
+        allowReplace: false,
+        allowRevert: false,
+        dropOnPage: true,
+        maxFiles: 20,
+      });
 
-        pond.on('processfile', (error, file) => {
-            if (error) { return; }
-
-            displayPosterAndLink(file.serverId);
-            storeFilename(file.serverId);
-        });
-
-        const postersContainer = document.getElementById('posters-container');
-        const maxDisplayedPosters = 20;
-        const displayedPosters = [];
-        const knownFilenames = loadAndDisplayStoredPosters();
-
-        function loadAndDisplayStoredPosters () {
-            const storedPosters = localStorage.getItem("posters");
-            const filenames = storedPosters ? JSON.parse(storedPosters) : [];
-            if (filenames) {
-                for (let filename of filenames) {
-                    displayPosterAndLink(filename);
-                }
-            }
-
-            return filenames
+      pond.on("processfile", (error, file) => {
+        if (error) {
+          return;
         }
 
-        function storeFilename (filename) {
-            if (!knownFilenames.includes(filename)) {
-                knownFilenames.push(filename);
-                if (knownFilenames.length > maxDisplayedPosters) {
-                     knownFilenames.shift();
-                }
-                localStorage.setItem("posters", JSON.stringify(knownFilenames));
-            }
+        displayPosterAndLink(file.serverId);
+        storeFilename(file.serverId);
+      });
+
+      const postersContainer = document.getElementById("posters-container");
+      const maxDisplayedPosters = 20;
+      const displayedPosters = [];
+      const knownFilenames = loadAndDisplayStoredPosters();
+
+      function loadAndDisplayStoredPosters() {
+        const storedPosters = localStorage.getItem("posters");
+        const filenames = storedPosters ? JSON.parse(storedPosters) : [];
+        if (filenames) {
+          for (let filename of filenames) {
+            displayPosterAndLink(filename);
+          }
         }
 
-        function displayPosterAndLink (filename) {
-            const img = document.createElement("img");
-            img.src = `./${filename}`;
-            const a = document.createElement("a");
-            a.href = `./${filename}`;
-            a.target = '_blank';
-            a.appendChild(img);
+        return filenames;
+      }
 
-            if (displayedPosters.includes(a)) {
-                return;
-            }
+      function storeFilename(filename) {
+        if (!knownFilenames.includes(filename)) {
+          knownFilenames.push(filename);
+          if (knownFilenames.length > maxDisplayedPosters) {
+            knownFilenames.shift();
+          }
+          localStorage.setItem("posters", JSON.stringify(knownFilenames));
+        }
+      }
 
-            postersContainer.appendChild(a);
-            displayedPosters.push(a);
+      function displayPosterAndLink(filename) {
+        const img = document.createElement("img");
+        img.src = `./${filename}`;
+        const a = document.createElement("a");
+        a.href = `./${filename}`;
+        a.target = "_blank";
+        a.appendChild(img);
 
-            if (displayedPosters.length > maxDisplayedPosters) {
-                postersContainer.removeChild(displayedPosters.shift());
-            }
+        if (displayedPosters.includes(a)) {
+          return;
         }
 
-        function purge () {
-            knownFilenames.length = 0;
-            localStorage.setItem("posters", JSON.stringify(knownFilenames));
+        postersContainer.appendChild(a);
+        displayedPosters.push(a);
 
-            while (postersContainer.firstChild) {
-                postersContainer.firstChild.remove();
-            }
-            displayedPosters.length = 0;
-
-            return false;
+        if (displayedPosters.length > maxDisplayedPosters) {
+          postersContainer.removeChild(displayedPosters.shift());
         }
+      }
+
+      function purge() {
+        knownFilenames.length = 0;
+        localStorage.setItem("posters", JSON.stringify(knownFilenames));
+
+        while (postersContainer.firstChild) {
+          postersContainer.firstChild.remove();
+        }
+        displayedPosters.length = 0;
+
+        return false;
+      }
     </script>
-</body>
+  </body>
 </html>
