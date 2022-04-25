@@ -1,0 +1,11 @@
+version: '3.3'
+
+services:
+  mangonel:
+    image: jf-guillou/uptime-kuma:latest
+    container_name: mangonel
+    volumes:
+      - ./mangonel:/app/storage
+    ports:
+      - 8066:8066
+    restart: always

@@ -7,20 +7,18 @@ COPY go.sum ./
 RUN go mod download
 
 COPY *.go ./
-COPY assets/ ./assets/
 
 RUN go build -o /mangonel
 
-FROM gcr.io/distroless/base-debian11
+FROM alpine:3.15
 
 WORKDIR /app
 
-COPY --from=build /mangonel /mangonel
+COPY --from=build /mangonel /app/mangonel
+COPY assets/ /app/assets/
 
 VOLUME /app/storage
 
 EXPOSE 8066
 
-USER nonroot:nonroot
-
-CMD [ "/mangonel" ]
+CMD [ "/app/mangonel" ]
